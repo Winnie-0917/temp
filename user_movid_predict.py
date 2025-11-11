@@ -1,6 +1,7 @@
 import os
 from train import VideoClassifier
 from skeleton import PoseExtractor
+import sys
 
 def predict_video(video_path):
     
@@ -8,18 +9,6 @@ def predict_video(video_path):
     if not os.path.exists(video_path):
         print(f"錯誤：找不到影片檔案 {video_path}")
         return
-    
-    # 先產生骨架影片（分析前的前處理輸出，不影響分類輸入）
-    try:
-        base, ext = os.path.splitext(video_path)
-        skeleton_output = f"{base}_skeleton{ext or '.mp4'}"
-        print(f"先產生骨架影片到: {skeleton_output}")
-        extractor = PoseExtractor()
-        extractor.extract_pose_from_video(video_path, skeleton_output)
-        print("骨架影片產生完成。")
-    except Exception as e:
-        # 不中斷主流程，僅提示
-        print(f"警告：產生骨架影片時發生錯誤：{e}")
     
     # 檢查模型是否存在
     if not os.path.exists('pose_classifier_model.h5'):
@@ -31,11 +20,9 @@ def predict_video(video_path):
     print("載入模型...")
     classifier = VideoClassifier()
     classifier.load_model()
-    video_path=skeleton_output
-    # 進行預測
+
     print(f"\n正在分析影片: {video_path}")
-    print("提取骨架特徵中...")
-    
+
     result = classifier.predict(video_path)
     
     # 顯示結果
@@ -55,7 +42,7 @@ def predict_video(video_path):
 
 
 def main():
-    video_path = "uploads/1.mp4"
+    video_path = sys.argv[1] if len(sys.argv) > 1 else None
     predict_video(video_path)
 
 
