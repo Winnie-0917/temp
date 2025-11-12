@@ -279,6 +279,123 @@ def get_training_status(task_id):
     return jsonify(response), 200
 
 
+# ============ Failure Analysis API Routes ============
+
+@app.route('/api/analyze-failure', methods=['POST'])
+def analyze_failure():
+    """分析失分影片並提供 AI 建議"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': '沒有收到檔案欄位 file'}), 400
+
+        file = request.files['file']
+        if not file or file.filename == '':
+            return jsonify({'error': '未選擇檔案'}), 400
+
+        # 儲存影片
+        filename = secure_filename(file.filename)
+        save_path = os.path.join(UPLOAD_DIR, f'failure_{uuid.uuid4()}_{filename}')
+        file.save(save_path)
+
+        # 是否使用 Gemini AI
+        use_gemini = request.form.get('use_gemini', 'true').lower() == 'true'
+        
+        # 初始化分析器
+        from failure_analyzer import FailureAnalyzer
+        analyzer = FailureAnalyzer()
+        
+        # 執行分析
+        print(f"🎬 開始分析失誤影片: {filename}")
+        result = analyzer.analyze_failure(save_path, use_gemini=use_gemini)
+        
+        # 返回結果
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'analysis': result,
+            'video_path': save_path
+        }), 200
+
+    except Exception as e:
+        print(f"❌ 分析失敗: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/analyze-failure/batch', methods=['POST'])
+def analyze_failure_batch():
+    """批次分析多個失誤影片"""
+    try:
+        if 'files' not in request.files:
+            return jsonify({'error': '沒有收到檔案欄位 files'}), 400
+
+        files = request.files.getlist('files')
+        if not files or len(files) == 0:
+            return jsonify({'error': '未選擇檔案'}), 400
+
+        use_gemini = request.form.get('use_gemini', 'true').lower() == 'true'
+        
+        from failure_analyzer import FailureAnalyzer
+        analyzer = FailureAnalyzer()
+        
+        results = []
+        for file in files:
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                save_path = os.path.join(UPLOAD_DIR, f'failure_{uuid.uuid4()}_{filename}')
+                file.save(save_path)
+                
+                try:
+                    analysis = analyzer.analyze_failure(save_path, use_gemini=use_gemini)
+                    results.append({
+                        'filename': filename,
+                        'success': True,
+                        'analysis': analysis
+                    })
+                except Exception as e:
+                    results.append({
+                        'filename': filename,
+                        'success': False,
+                        'error': str(e)
+                    })
+        
+        return jsonify({
+            'total': len(files),
+            'results': results
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/analyze-failure/config', methods=['GET'])
+def get_analysis_config():
+    """取得分析配置資訊"""
+    try:
+        # 檢查 Gemini API 是否可用 - 實際初始化分析器來測試
+        from failure_analyzer import FailureAnalyzer
+        test_analyzer = FailureAnalyzer()
+        gemini_available = test_analyzer.model is not None
+        
+        return jsonify({
+            'gemini_available': gemini_available,
+            'supported_formats': ['mp4', 'avi', 'mov', 'mkv'],
+            'max_duration_seconds': 10,
+            'recommended_duration_seconds': 4,
+            'analysis_modes': {
+                'basic': '基礎分析（僅使用 MediaPipe）',
+                'gemini': 'AI 深度分析（使用 Gemini）'
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # Generic static file route: allow fetching other files (images, css, js) from repo root
 @app.route('/<path:filename>')
 def serve_static_other(filename: str):

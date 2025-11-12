@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import Navbar from '../components/Navbar';
 
 export default function AnalyzePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -139,34 +139,14 @@ export default function AnalyzePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-xl border-b border-blue-200/50 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-5xl mx-auto px-6 py-5">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-semibold text-blue-900 tracking-tight">
-                Motion <span className="text-indigo-600">Analysis</span>
-              </h1>
-              <p className="mt-1 text-xs text-blue-700/70 font-light">
-                Upload video for quality analysis
-              </p>
-            </div>
-            <Link
-              href="/"
-              className="px-5 py-2.5 bg-white border border-blue-300 text-blue-700 text-sm font-medium rounded-full hover:bg-blue-50 transition-all duration-200 shadow-sm"
-            >
-              返回
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      
+      <main className="max-w-5xl mx-auto px-6 py-8">
         {/* Upload Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-blue-200/50 p-8 mb-8 shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold text-blue-900">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">
               上傳影片
             </h2>
             {selectedFile && !loading && (

@@ -16,7 +16,14 @@
 - **信心度顯示**：機率分布與視覺化
 - **即時分析**：上傳影片立即獲得反饋
 
-### 🧠 模型訓練
+### � 失誤分析（NEW!）
+- **Gemini AI 整合**：使用 Google Gemini 進行深度分析
+- **自然語言建議**：專業教練級的改進建議
+- **多維度分析**：站位、拍面角度、身體平衡、擊球時機
+- **結構化數據**：完整的技術指標與姿態數據
+- **雙模式支援**：基礎分析 / AI 深度分析
+
+### �🧠 模型訓練
 - **網頁訓練介面**：無需命令列，直接在瀏覽器訓練
 - **彈性配置**：模型類型、訓練輪數、批次大小、學習率
 - **即時進度**：訓練進度、準確率、損失值即時顯示
@@ -70,11 +77,15 @@ Table-tennis-AI/
 ├── backend/                    # Flask 後端
 │   ├── app.py                 # 主應用程式
 │   ├── crawler.py             # WTT 排名爬蟲
+│   ├── failure_analyzer.py    # 失誤分析模組（Gemini AI）🆕
 │   ├── train_web.py           # 網頁訓練腳本
 │   ├── train_optimized.py     # 優化訓練腳本
 │   ├── skeleton.py            # MediaPipe 骨架提取
 │   ├── user_movid_predict.py  # 影片預測
+│   ├── test_failure_analyzer.py # 失誤分析測試腳本 🆕
 │   ├── requirements.txt       # Python 依賴
+│   ├── .env.example           # 環境變數範例 🆕
+│   ├── FAILURE_ANALYSIS_GUIDE.md # 失誤分析使用指南 🆕
 │   ├── Dockerfile             # 後端容器配置
 │   ├── good_input_movid/      # 優良動作訓練影片
 │   ├── normal_input_movid/    # 一般動作訓練影片
@@ -91,6 +102,7 @@ Table-tennis-AI/
 │   ├── package.json           # Node.js 依賴
 │   └── Dockerfile             # 前端容器配置
 │
+├── failure_analysis.html       # 失誤分析測試頁面 🆕
 └── docker-compose.yml          # 容器編排配置
 ```
 
@@ -99,7 +111,8 @@ Table-tennis-AI/
 ### 後端
 - **框架**：Flask 3.0.0
 - **機器學習**：TensorFlow 2.13+, MediaPipe 0.10+
-- **影像處理**：OpenCV 4.8+
+- **AI 分析**：Google Generative AI (Gemini 1.5 Pro) 🆕
+- **影像處理**：OpenCV 4.8+, Pillow 10.0+
 - **排程**：APScheduler
 - **容器**：Docker
 
@@ -114,6 +127,11 @@ Table-tennis-AI/
 - **標準化**：StandardScaler
 - **分類**：3 類別（good / normal / bad）
 
+### AI 分析（NEW!）
+- **模型**：Gemini 1.5 Pro / 2.5 Pro
+- **能力**：多模態分析（影片 + 結構化數據）
+- **輸出**：自然語言 + JSON 結構化建議
+
 ## 📖 使用指南
 
 ### 1. 查看排名
@@ -127,7 +145,22 @@ Table-tennis-AI/
 3. 點擊「開始分析」
 4. 查看分析結果與建議
 
-### 3. 訓練模型
+### 3. 失誤分析（NEW!）🤖
+1. 訪問 `http://localhost:5000/failure_analysis.html`
+2. 上傳 3-5 秒的失分影片片段
+3. 選擇是否使用 Gemini AI 深度分析
+4. 獲得專業的失誤原因分析與改進建議
+
+**配置 Gemini API：**
+```bash
+cd backend
+cp .env.example .env
+# 編輯 .env，填入您的 GEMINI_API_KEY
+```
+
+**詳細說明：** 參考 [backend/FAILURE_ANALYSIS_GUIDE.md](backend/FAILURE_ANALYSIS_GUIDE.md)
+
+### 4. 訓練模型
 1. 點擊「🧠 訓練」按鈕進入訓練頁面
 2. 配置訓練參數（模型類型、輪數、批次大小等）
 3. 開啟資料擴增（可選）
@@ -181,6 +214,18 @@ docker-compose logs -f
   - 參數：`file` (影片檔案)
   - 返回：`{ classification, confidence, probabilities }`
 
+### 失誤分析 API（NEW!）🆕
+- `POST /api/analyze-failure` - 單一影片失誤分析
+  - 參數：`file` (影片檔案), `use_gemini` (是否使用 Gemini)
+  - 返回：`{ success, analysis: { structured_data, ai_analysis } }`
+  
+- `POST /api/analyze-failure/batch` - 批次失誤分析
+  - 參數：`files` (多個影片), `use_gemini`
+  - 返回：`{ total, results: [...] }`
+  
+- `GET /api/analyze-failure/config` - 取得分析配置
+  - 返回：支援格式、Gemini 可用性等
+
 ### 訓練 API
 - `POST /api/train` - 啟動訓練任務
 - `GET /api/train/status/<task_id>` - 查詢訓練狀態
@@ -189,7 +234,9 @@ docker-compose logs -f
 
 - [ ] 支援更多排名類別（女子單打、女子雙打、混雙）
 - [ ] 增加歷史排名趨勢圖
-- [ ] 影片分析結果詳細報告
+- [ ] 失誤分析整合至前端（Next.js 頁面）🆕
+- [ ] YOLO + ByteTrack 球追蹤整合 🆕
+- [ ] 影片分析結果視覺化報告 🆕
 - [ ] 模型效能優化與量化
 - [ ] 多語言支援
 - [ ] 行動裝置 APP
@@ -210,6 +257,8 @@ Hank - [GitHub](https://github.com/hank31169638)
 
 - World Table Tennis (WTT) - 排名數據來源
 - MediaPipe - 姿態估計
+- Google Gemini - AI 深度分析 🆕
+- TensorFlow - 深度學習框架
 - TensorFlow - 機器學習框架
 - Next.js - 前端框架
 

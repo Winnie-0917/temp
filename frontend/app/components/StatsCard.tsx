@@ -12,6 +12,9 @@ export default function StatsCard({ title, value, icon, color }: StatsCardProps)
     green: 'from-emerald-400 to-teal-500',
     purple: 'from-purple-400 to-pink-500',
   };
+  
+  // 安全處理 value
+  const displayValue = typeof value === 'number' ? value : 0;
 
   return (
     <div className="group bg-white/80 backdrop-blur-sm rounded-2xl border border-orange-200/50 p-6 transition-all duration-300 hover:border-orange-300 hover:shadow-lg">
@@ -21,7 +24,7 @@ export default function StatsCard({ title, value, icon, color }: StatsCardProps)
             {title}
           </p>
           <p className="text-3xl font-semibold text-orange-900 tabular-nums">
-            {value}
+            {displayValue}
           </p>
         </div>
         <div className={`text-4xl opacity-80 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${colorClasses[color]} bg-clip-text text-transparent`}>

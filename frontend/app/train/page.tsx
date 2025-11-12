@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Navbar from '../components/Navbar';
 
 interface TrainingConfig {
   model_type: string;
@@ -105,29 +106,17 @@ export default function TrainPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-xl border-b border-emerald-200/50 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-5">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-semibold text-emerald-900 tracking-tight">
-                Model <span className="text-teal-600">Training</span>
-              </h1>
-              <p className="mt-1 text-xs text-emerald-700/70 font-light">
-                Configure and train your model
-              </p>
-            </div>
-            <Link
-              href="/"
-              className="px-5 py-2.5 bg-white border border-emerald-300 text-emerald-700 text-sm font-medium rounded-full hover:bg-emerald-50 transition-all duration-200 shadow-sm"
-            >
-              返回
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="max-w-6xl mx-auto px-6 py-12">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            模型訓練
+          </h2>
+          <p className="mt-2 text-slate-600">配置並訓練您的 AI 模型</p>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column - Configuration */}
           <div className="space-y-6">

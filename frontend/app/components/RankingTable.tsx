@@ -15,15 +15,73 @@ interface RankingTableProps {
 
 export default function RankingTable({ data, category }: RankingTableProps) {
   const isDoubles = category.includes('DOUBLES');
+  
+  // 安全檢查：確保 data 是陣列
+  if (!data || !Array.isArray(data)) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+        <p className="text-gray-400">暫無數據</p>
+      </div>
+    );
+  }
 
+  // 生成頭像 URL - 方案 1: 空格轉 %20
   const getPlayerPhotoUrl = (ittfId: string, playerName: string) => {
     const encodedName = playerName.replace(/ /g, '%20');
     return `https://photofiles.worldtabletennis.com/wtt-media/photos/400px/${ittfId}_Headshot_R_${encodedName}.png`;
   };
 
+  // 生成頭像 URL - 方案 2: 空格轉 _
   const getPlayerPhotoUrlWithUnderscore = (ittfId: string, playerName: string) => {
     const encodedName = playerName.replace(/ /g, '_');
     return `https://photofiles.worldtabletennis.com/wtt-media/photos/400px/${ittfId}_Headshot_R_${encodedName}.png`;
+  };
+
+  // 生成頭像 URL - 方案 3: HEADSHOT 大寫
+  const getPlayerPhotoUrlUppercase = (ittfId: string, playerName: string) => {
+    const encodedName = playerName.replace(/ /g, '_');
+    return `https://photofiles.worldtabletennis.com/wtt-media/photos/400px/${ittfId}_HEADSHOT_R_${encodedName}.png`;
+  };
+
+  // 生成頭像 URL - 方案 4: 名字前後對調 (Hugo CALDERANO -> CALDERANO_Hugo)
+  const getPlayerPhotoUrlReversed = (ittfId: string, playerName: string) => {
+    const parts = playerName.split(' ');
+    if (parts.length >= 2) {
+      // 反轉名字順序：Hugo CALDERANO -> CALDERANO Hugo
+      const reversedName = `${parts[1]}_${parts[0]}`;
+      return `https://photofiles.worldtabletennis.com/wtt-media/photos/400px/${ittfId}_Headshot_R_${reversedName}.png`;
+    }
+    return getPlayerPhotoUrl(ittfId, playerName);
+  };
+
+  // 生成頭像 URL - 方案 5: 中間的連字符 - 轉成 _ (LIN Yun-Ju -> LIN_Yun_Ju)
+  const getPlayerPhotoUrlHyphenToUnderscore = (ittfId: string, playerName: string) => {
+    const encodedName = playerName.replace(/ /g, '_').replace(/-/g, '_');
+    return `https://photofiles.worldtabletennis.com/wtt-media/photos/400px/${ittfId}_Headshot_R_${encodedName}.png`;
+  };
+
+  // 生成頭像 URL - 方案 6: 第一個空格轉 _, 後面空格轉 %20 (LEE Sang Su -> LEE_Sang%20Su)
+  const getPlayerPhotoUrlMixedEncoding = (ittfId: string, playerName: string) => {
+    const parts = playerName.split(' ');
+    if (parts.length >= 2) {
+      // 第一個空格轉 _, 其餘空格轉 %20
+      const firstName = parts[0];
+      const restName = parts.slice(1).join('%20');
+      const encodedName = `${firstName}_${restName}`;
+      return `https://photofiles.worldtabletennis.com/wtt-media/photos/400px/${ittfId}_Headshot_R_${encodedName}.png`;
+    }
+    return getPlayerPhotoUrl(ittfId, playerName);
+  };
+
+  // 生成頭像 URL - 方案 7: 全小寫 (LEE Sang Su -> lee_sang_su)
+  const getPlayerPhotoUrlLowercase = (ittfId: string, playerName: string) => {
+    const encodedName = playerName.toLowerCase().replace(/ /g, '_').replace(/-/g, '_');
+    return `https://photofiles.worldtabletennis.com/wtt-media/photos/400px/${ittfId}_Headshot_R_${encodedName}.png`;
+  };
+
+  // SVG 預設頭像
+  const getDefaultAvatar = () => {
+    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"%3E%3Ccircle cx="24" cy="24" r="24" fill="%23FED7AA"/%3E%3Cpath d="M24 24c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6zm0 3c-4 0-12 2-12 6v3h24v-3c0-4-8-6-12-6z" fill="%23F97316"/%3E%3C/svg%3E';
   };
 
   const getRankChange = (current: number, previous?: number) => {
@@ -86,11 +144,36 @@ export default function RankingTable({ data, category }: RankingTableProps) {
                       className="w-10 h-10 rounded-full object-cover border-2 border-orange-200"
                       onError={(e) => {
                         const target = e.currentTarget;
-                        if (!target.dataset.retried) {
-                          target.dataset.retried = 'true';
+                        const retry = target.dataset.retry || '0';
+                        
+                        if (retry === '0') {
+                          // 第一次失敗：嘗試空格轉底線
+                          target.dataset.retry = '1';
                           target.src = getPlayerPhotoUrlWithUnderscore(player.IttfId, player.PlayerName);
+                        } else if (retry === '1') {
+                          // 第二次失敗：嘗試 HEADSHOT 大寫
+                          target.dataset.retry = '2';
+                          target.src = getPlayerPhotoUrlUppercase(player.IttfId, player.PlayerName);
+                        } else if (retry === '2') {
+                          // 第三次失敗：嘗試名字前後對調
+                          target.dataset.retry = '3';
+                          target.src = getPlayerPhotoUrlReversed(player.IttfId, player.PlayerName);
+                        } else if (retry === '3') {
+                          // 第四次失敗：嘗試連字符轉底線 (LIN Yun-Ju -> LIN_Yun_Ju)
+                          target.dataset.retry = '4';
+                          target.src = getPlayerPhotoUrlHyphenToUnderscore(player.IttfId, player.PlayerName);
+                        } else if (retry === '4') {
+                          // 第五次失敗：嘗試混合編碼 (LEE Sang Su -> LEE_Sang%20Su)
+                          target.dataset.retry = '5';
+                          target.src = getPlayerPhotoUrlMixedEncoding(player.IttfId, player.PlayerName);
+                        } else if (retry === '5') {
+                          // 第六次失敗：嘗試全小寫
+                          target.dataset.retry = '6';
+                          target.src = getPlayerPhotoUrlLowercase(player.IttfId, player.PlayerName);
                         } else {
-                          target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"%3E%3Ccircle cx="24" cy="24" r="24" fill="%23FED7AA"/%3E%3Cpath d="M24 24c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6zm0 3c-4 0-12 2-12 6v3h24v-3c0-4-8-6-12-6z" fill="%23F97316"/%3E%3C/svg%3E';
+                          // 所有方案都失敗：使用預設頭像
+                          target.dataset.retry = '7';
+                          target.src = getDefaultAvatar();
                         }
                       }}
                     />
