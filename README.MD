@@ -1,3 +1,0 @@
-> 分別將影片放入good_input_movid、normal_input_movid、bad_input_movid資料夾進行訓練
-
-> 需先將server.py執行，網頁才能上傳影片
