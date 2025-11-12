@@ -4,14 +4,19 @@
 
 FROM python:3.11-slim
 
-# 安裝 Node.js 和系統依賴
+# 安裝系統依賴
 RUN apt-get update && apt-get install -y \
     curl \
+    gnupg \
+    ca-certificates \
     libgl1-mesa-glx \
     libglib2.0-0 \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
+
+# 安裝 Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
