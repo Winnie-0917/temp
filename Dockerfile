@@ -43,7 +43,7 @@ echo "🚀 Starting Table Tennis AI..."\n\
 # 啟動後端\n\
 echo "📡 Starting Backend on port 5000..."\n\
 cd /app/backend\n\
-python app.py &\n\
+python3 app.py &\n\
 BACKEND_PID=$!\n\
 \n\
 # 等待後端啟動\n\
