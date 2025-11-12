@@ -67,9 +67,7 @@ export default function AnalyzePage() {
     formData.append('file', selectedFile);
 
     try {
-      const apiUrl = typeof window !== 'undefined' 
-        ? 'http://localhost:5000' 
-        : 'http://backend:5000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
