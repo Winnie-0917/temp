@@ -5,11 +5,25 @@
 import os
 import json
 import base64
-import cv2
 import numpy as np
 from typing import Dict, List, Tuple, Optional
+
+# 嘗試導入 cv2 和 skeleton（雲端部署可能沒有這些套件）
+try:
+    import cv2
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    cv2 = None
+
+try:
+    from skeleton import PoseExtractor
+    SKELETON_AVAILABLE = True
+except (ImportError, RuntimeError):
+    SKELETON_AVAILABLE = False
+    PoseExtractor = None
+
 import google.generativeai as genai
-from skeleton import PoseExtractor
 from dotenv import dotenv_values
 
 class FailureAnalyzer:
@@ -34,7 +48,13 @@ class FailureAnalyzer:
             self.model = None
             print("⚠️  未設定 GEMINI_API_KEY，將使用基礎分析模式")
         
-        self.pose_extractor = PoseExtractor()
+        # 姿勢提取器（可能不可用）
+        self.pose_extractor = None
+        if SKELETON_AVAILABLE:
+            try:
+                self.pose_extractor = PoseExtractor()
+            except Exception as e:
+                print(f"⚠️ PoseExtractor 初始化失敗: {e}")
     
     def extract_key_frames(self, video_path: str, num_frames: int = 5) -> List[np.ndarray]:
         """
