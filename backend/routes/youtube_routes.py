@@ -91,6 +91,72 @@ def analyze_youtube():
             result['record_id'] = record_id
             print(f"✅ 分析紀錄已儲存: {record_id}")
             
+            # 儲存選手檔案
+            try:
+                from services.player_profile_service import get_player_profile_service
+                import re
+                
+                profile_service = get_player_profile_service()
+                
+                analysis = result.get('analysis', {})
+                structured = analysis.get('structured_data', {})
+                sections = analysis.get('sections', {})
+                video_info = result.get('video_info', {})
+                
+                # 如果沒有 player_focus，嘗試從影片標題解析
+                p1_name = player_focus
+                p2_name = player2_focus
+                
+                if not p1_name or not p2_name:
+                    video_title = video_info.get('title', '')
+                    # 嘗試解析 "A VS B" 格式
+                    vs_patterns = [
+                        r'(.+?)\s+[Vv][Ss]\.?\s+(.+?)(?:\s*[|｜]|$)',
+                        r'(.+?)\s+[Vv][Ss]\.?\s+(.+)',
+                        r'(.+?)[對対]\s*(.+?)(?:\s*[|｜]|$)',
+                    ]
+                    for pattern in vs_patterns:
+                        match = re.match(pattern, video_title)
+                        if match:
+                            if not p1_name:
+                                p1_name = match.group(1).strip()
+                            if not p2_name:
+                                p2_name = match.group(2).strip()
+                            print(f"📝 從標題解析選手: {p1_name} vs {p2_name}")
+                            break
+                
+                # 儲存選手 1 的檔案
+                if p1_name:
+                    p1_analysis = structured.get('player1_analysis', {})
+                    profile_service.save_player_analysis(
+                        player_name=p1_name,
+                        match_id=record_id,
+                        video_id=video_info.get('video_id', ''),
+                        opponent_name=p2_name or '對手',
+                        ratings=p1_analysis.get('ratings', {}),
+                        strengths=sections.get('strengths', []),
+                        weaknesses=sections.get('weaknesses', [])
+                    )
+                    print(f"✅ 選手檔案已更新: {p1_name}")
+                
+                # 儲存選手 2 的檔案
+                if p2_name:
+                    p2_analysis = structured.get('player2_analysis', {})
+                    profile_service.save_player_analysis(
+                        player_name=p2_name,
+                        match_id=record_id,
+                        video_id=video_info.get('video_id', ''),
+                        opponent_name=p1_name or '選手 1',
+                        ratings=p2_analysis.get('ratings', {})
+                    )
+                    print(f"✅ 選手檔案已更新: {p2_name}")
+                    
+            except Exception as profile_error:
+                print(f"⚠️ 選手檔案儲存失敗: {str(profile_error)}")
+                import traceback
+                traceback.print_exc()
+                # 不影響主要流程
+            
             return jsonify(result), 200
         else:
             return jsonify(result), 500

@@ -1,10 +1,21 @@
-import cv2
 import os
 import numpy as np
-import mediapipe as mp
+
+# 嘗試導入 cv2 和 mediapipe（雲端部署可能沒有這些套件）
+try:
+    import cv2
+    import mediapipe as mp
+    MEDIAPIPE_AVAILABLE = True
+except ImportError:
+    MEDIAPIPE_AVAILABLE = False
+    cv2 = None
+    mp = None
 
 class PoseExtractor:
     def __init__(self):
+        if not MEDIAPIPE_AVAILABLE:
+            raise RuntimeError("MediaPipe 未安裝，姿勢提取功能無法使用")
+        
         # 初始化 MediaPipe 姿勢檢測器
         self.mp_pose = mp.solutions.pose
         self.mp_drawing = mp.solutions.drawing_utils

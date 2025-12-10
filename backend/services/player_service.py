@@ -143,6 +143,45 @@ class PlayerService:
         self._load_all_players()
         return self.players_cache.get(player_id)
 
+    def find_player_by_name(self, name: str) -> Optional[Dict[str, Any]]:
+        """
+        根據名稱尋找選手（模糊比對）
+        
+        Args:
+            name: 選手名稱（中文或英文）
+            
+        Returns:
+            找到的選手資料，包含 photo_url
+        """
+        if not name:
+            return None
+            
+        self._load_all_players()
+        name_lower = name.lower().strip()
+        
+        # 精確比對
+        for player in self.players_cache.values():
+            player_name = player.get('name', '').lower()
+            if player_name == name_lower:
+                return player
+        
+        # 部分比對（名字包含搜尋詞）
+        for player in self.players_cache.values():
+            player_name = player.get('name', '').lower()
+            if name_lower in player_name or player_name in name_lower:
+                return player
+        
+        # 處理 "姓名" vs "名姓" 格式（如 "Lin Yun-Ju" vs "Yun-Ju Lin"）
+        name_parts = name_lower.replace('-', ' ').split()
+        if len(name_parts) >= 2:
+            for player in self.players_cache.values():
+                player_name = player.get('name', '').lower().replace('-', ' ')
+                # 檢查所有名字部分是否都在選手名字中
+                if all(part in player_name for part in name_parts):
+                    return player
+        
+        return None
+
 _player_service = None
 
 def get_player_service():
