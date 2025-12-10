@@ -82,11 +82,29 @@ class PlayerProfileService:
             with open(profile_path, 'r', encoding='utf-8') as f:
                 profile = json.load(f)
         else:
+            # 嘗試從世界排名資料庫取得選手頭像
+            avatar_url = None
+            ittf_player = None
+            try:
+                from services.player_service import get_player_service
+                player_service = get_player_service()
+                ittf_player = player_service.find_player_by_name(player_name)
+                if ittf_player:
+                    avatar_url = ittf_player.get('photo_url')
+                    print(f"🎯 找到世界排名選手: {ittf_player.get('name')} (ITTF ID: {ittf_player.get('id')})")
+            except Exception as e:
+                print(f"⚠️ 無法從排名資料庫取得選手資料: {e}")
+            
             profile = {
                 'player_id': player_id,
                 'display_name': player_name,
                 'aliases': [],
-                'avatar_url': None,
+                'avatar_url': avatar_url,
+                'ittf_id': ittf_player.get('id') if ittf_player else None,
+                'ittf_name': ittf_player.get('name') if ittf_player else None,
+                'country': ittf_player.get('country') if ittf_player else None,
+                'country_code': ittf_player.get('country_code') if ittf_player else None,
+                'world_ranking': ittf_player.get('rankings') if ittf_player else None,
                 'aggregate_ratings': {},
                 'match_history': [],
                 'total_matches': 0,

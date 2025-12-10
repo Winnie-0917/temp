@@ -119,11 +119,25 @@ export default function PlayerProfileCard({ playerName, onClose }: PlayerProfile
                     </button>
 
                     <div className="flex items-center gap-4">
-                        <div className="w-20 h-20 rounded-full bg-white/20 border-4 border-white/30 flex items-center justify-center text-3xl font-bold">
-                            {profile.display_name.charAt(0)}
+                        <div className="w-20 h-20 rounded-full bg-white/20 border-4 border-white/30 flex items-center justify-center text-3xl font-bold overflow-hidden">
+                            {profile.avatar_url ? (
+                                <img
+                                    src={profile.avatar_url}
+                                    alt={profile.display_name}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                />
+                            ) : (
+                                profile.display_name.charAt(0)
+                            )}
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold">{profile.display_name}</h2>
+                            {(profile as any).country && (
+                                <p className="text-white/80 text-sm mb-1">
+                                    🌏 {(profile as any).country}
+                                </p>
+                            )}
                             <p className="text-white/70 text-sm">
                                 已分析 {profile.total_matches || 0} 場比賽
                             </p>
@@ -179,8 +193,8 @@ export default function PlayerProfileCard({ playerName, onClose }: PlayerProfile
                                             vs {match.opponent}
                                         </span>
                                         <span className={`text-xs px-2 py-1 rounded-full ${match.result === '勝' ? 'bg-green-100 text-green-700' :
-                                                match.result === '負' ? 'bg-red-100 text-red-700' :
-                                                    'bg-neutral-200 text-neutral-600'
+                                            match.result === '負' ? 'bg-red-100 text-red-700' :
+                                                'bg-neutral-200 text-neutral-600'
                                             }`}>
                                             {match.result}
                                         </span>
