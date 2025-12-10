@@ -1,0 +1,202 @@
+{
+  "wang_chuqin": {
+    "name": "Wang Chuqin",
+    "country": "CHN",
+    "rank": 1,
+    "style": "攻擊型",
+    "rating": 95,
+    "gender": "men"
+  },
+  "fan_zhendong": {
+    "name": "Fan Zhendong",
+    "country": "CHN",
+    "rank": 2,
+    "style": "攻擊型",
+    "rating": 94,
+    "gender": "men"
+  },
+  "ma_long": {
+    "name": "Ma Long",
+    "country": "CHN",
+    "rank": 3,
+    "style": "全面型",
+    "rating": 93,
+    "gender": "men"
+  },
+  "liang_jingkun": {
+    "name": "Liang Jingkun",
+    "country": "CHN",
+    "rank": 4,
+    "style": "攻擊型",
+    "rating": 91,
+    "gender": "men"
+  },
+  "lin_shidong": {
+    "name": "Lin Shidong",
+    "country": "CHN",
+    "rank": 5,
+    "style": "攻擊型",
+    "rating": 90,
+    "gender": "men"
+  },
+  "tomokazu_harimoto": {
+    "name": "Tomokazu Harimoto",
+    "country": "JPN",
+    "rank": 6,
+    "style": "攻擊型",
+    "rating": 89,
+    "gender": "men"
+  },
+  "hugo_calderano": {
+    "name": "Hugo Calderano",
+    "country": "BRA",
+    "rank": 7,
+    "style": "攻擊型",
+    "rating": 88,
+    "gender": "men"
+  },
+  "lin_yun-ju": {
+    "name": "Lin Yun-Ju",
+    "country": "TPE",
+    "rank": 8,
+    "style": "快攻型",
+    "rating": 87,
+    "gender": "men"
+  },
+  "truls_moregard": {
+    "name": "Truls Moregard",
+    "country": "SWE",
+    "rank": 9,
+    "style": "攻擊型",
+    "rating": 86,
+    "gender": "men"
+  },
+  "felix_lebrun": {
+    "name": "Felix Lebrun",
+    "country": "FRA",
+    "rank": 10,
+    "style": "攻擊型",
+    "rating": 85,
+    "gender": "men"
+  },
+  "quadri_aruna": {
+    "name": "Quadri Aruna",
+    "country": "NGR",
+    "rank": 11,
+    "style": "力量型",
+    "rating": 84,
+    "gender": "men"
+  },
+  "lim_jonghoon": {
+    "name": "Lim Jonghoon",
+    "country": "KOR",
+    "rank": 12,
+    "style": "防守型",
+    "rating": 83,
+    "gender": "men"
+  },
+  "dimitrij_ovtcharov": {
+    "name": "Dimitrij Ovtcharov",
+    "country": "GER",
+    "rank": 13,
+    "style": "全面型",
+    "rating": 82,
+    "gender": "men"
+  },
+  "patrick_franziska": {
+    "name": "Patrick Franziska",
+    "country": "GER",
+    "rank": 14,
+    "style": "攻擊型",
+    "rating": 81,
+    "gender": "men"
+  },
+  "darko_jorgic": {
+    "name": "Darko Jorgic",
+    "country": "SLO",
+    "rank": 15,
+    "style": "攻擊型",
+    "rating": 80,
+    "gender": "men"
+  },
+  "sun_yingsha": {
+    "name": "Sun Yingsha",
+    "country": "CHN",
+    "rank": 1,
+    "style": "攻擊型",
+    "rating": 96,
+    "gender": "women"
+  },
+  "wang_manyu": {
+    "name": "Wang Manyu",
+    "country": "CHN",
+    "rank": 2,
+    "style": "攻擊型",
+    "rating": 94,
+    "gender": "women"
+  },
+  "chen_meng": {
+    "name": "Chen Meng",
+    "country": "CHN",
+    "rank": 3,
+    "style": "全面型",
+    "rating": 93,
+    "gender": "women"
+  },
+  "wang_yidi": {
+    "name": "Wang Yidi",
+    "country": "CHN",
+    "rank": 4,
+    "style": "攻擊型",
+    "rating": 91,
+    "gender": "women"
+  },
+  "shin_yubin": {
+    "name": "Shin Yubin",
+    "country": "KOR",
+    "rank": 5,
+    "style": "快攻型",
+    "rating": 89,
+    "gender": "women"
+  },
+  "hina_hayata": {
+    "name": "Hina Hayata",
+    "country": "JPN",
+    "rank": 6,
+    "style": "攻擊型",
+    "rating": 88,
+    "gender": "women"
+  },
+  "mima_ito": {
+    "name": "Mima Ito",
+    "country": "JPN",
+    "rank": 7,
+    "style": "快攻型",
+    "rating": 87,
+    "gender": "women"
+  },
+  "cheng_i-ching": {
+    "name": "Cheng I-Ching",
+    "country": "TPE",
+    "rank": 8,
+    "style": "全面型",
+    "rating": 85,
+    "gender": "women"
+  },
+  "bernadette_szocs": {
+    "name": "Bernadette Szocs",
+    "country": "ROU",
+    "rank": 9,
+    "style": "攻擊型",
+    "rating": 83,
+    "gender": "women"
+  },
+  "adriana_diaz": {
+    "name": "Adriana Diaz",
+    "country": "PUR",
+    "rank": 10,
+    "style": "攻擊型",
+    "rating": 82,
+    "gender": "women"
+  }
+}

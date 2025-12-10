@@ -1,11 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Navbar from './components/Navbar';
 import RankingTable from './components/RankingTable';
-import StatsCard from './components/StatsCard';
-import CategorySelector from './components/CategorySelector';
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('SEN_SINGLES');
@@ -13,10 +10,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string>('');
 
-  const categoryNames: { [key: string]: string } = {
-    'SEN_SINGLES': '男子單打',
-    'SEN_DOUBLES': '男子雙打',
-  };
+  const categories = [
+    { key: 'SEN_SINGLES', label: '男子單打' },
+    { key: 'SEN_DOUBLES', label: '男子雙打' },
+  ];
 
   useEffect(() => {
     fetchRankingData(selectedCategory);
@@ -83,82 +80,92 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-neutral-950">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-6 py-10">
         {/* Header Section */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
-              世界桌球排名
-            </h2>
-            <p className="mt-2 text-slate-600">實時更新的 ITTF 官方排名數據</p>
+        <div className="mb-10">
+          <h2 className="text-3xl font-semibold text-white tracking-tight">
+            世界桌球排名
+          </h2>
+          <p className="mt-2 text-neutral-500">ITTF 官方排名數據</p>
+        </div>
+
+        {/* Stats + Controls Row */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          {/* Category Tabs */}
+          <div className="flex gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat.key}
+                onClick={() => setSelectedCategory(cat.key)}
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200
+                  ${selectedCategory === cat.key
+                    ? 'bg-white text-neutral-900'
+                    : 'bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700'
+                  }`}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
+
+          {/* Update Button */}
           <button
             onClick={handleManualUpdate}
             disabled={loading}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg"
+            className="px-4 py-2 text-sm font-medium rounded-full bg-neutral-800 text-neutral-300 
+                       hover:bg-neutral-700 hover:text-white transition-all duration-200
+                       disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {loading ? '🔄 更新中...' : '🔄 更新數據'}
+            <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {loading ? '更新中...' : '更新數據'}
           </button>
-        </div>
-
-        {/* Category Selector */}
-        <div className="mb-6">
-          <CategorySelector
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            categoryNames={categoryNames}
-          />
         </div>
 
         {/* Stats Cards */}
         {!loading && rankingData && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <StatsCard
-              title="總選手數"
-              value={getTotalPlayers()}
-              icon="👥"
-              color="blue"
-            />
-            <StatsCard
-              title="前二十名"
-              value={getTopPlayers().length}
-              icon="🏆"
-              color="yellow"
-            />
-            <StatsCard
-              title="參賽國家"
-              value={getCountryDistribution().length}
-              icon="🌍"
-              color="green"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
+              <div className="text-neutral-500 text-sm mb-1">總選手數</div>
+              <div className="text-2xl font-semibold text-white">{getTotalPlayers()}</div>
+            </div>
+            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
+              <div className="text-neutral-500 text-sm mb-1">前二十名</div>
+              <div className="text-2xl font-semibold text-white">{getTopPlayers().length}</div>
+            </div>
+            <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-5">
+              <div className="text-neutral-500 text-sm mb-1">參賽國家</div>
+              <div className="text-2xl font-semibold text-white">{getCountryDistribution().length}+</div>
+            </div>
           </div>
         )}
 
         {/* Country Distribution */}
         {!loading && rankingData && (
-          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-4">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 mb-8">
+            <h3 className="text-sm font-medium text-neutral-400 uppercase tracking-wider mb-4">
               國家分布
-            </h2>
+            </h3>
             <div className="space-y-3">
               {getCountryDistribution().map(([country, count], index) => (
                 <div key={country} className="flex items-center gap-3">
-                  <span className="w-6 text-center text-sm font-medium text-gray-400">
+                  <span className="w-6 text-center text-sm font-medium text-neutral-500">
                     {index + 1}
                   </span>
-                  <span className="w-32 font-medium text-gray-900 text-sm">
+                  <span className="w-28 text-sm text-neutral-300">
                     {country}
                   </span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                  <div className="flex-1 bg-neutral-800 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-gray-600 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${(count / getTotalPlayers()) * 100}%` }}
+                      className="bg-white h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.max((count / getTotalPlayers()) * 100 * 5, 5)}%` }}
                     />
                   </div>
-                  <span className="w-12 text-right text-sm font-medium text-gray-700">
+                  <span className="w-10 text-right text-sm font-medium text-neutral-400">
                     {count}
                   </span>
                 </div>
@@ -170,19 +177,22 @@ export default function Home() {
         {/* Ranking Table */}
         {loading ? (
           <div className="flex flex-col justify-center items-center h-64">
-            <div className="w-12 h-12 border-3 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-            <p className="mt-4 text-sm text-gray-600">載入中...</p>
+            <div className="w-10 h-10 border-2 border-neutral-700 border-t-white rounded-full animate-spin"></div>
+            <p className="mt-4 text-sm text-neutral-500">載入中...</p>
           </div>
         ) : rankingData ? (
           <div>
-            <div className="mb-3 text-xs text-gray-500">
+            <div className="mb-4 text-xs text-neutral-500 flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               更新時間: {new Date(lastUpdate).toLocaleString('zh-TW')}
             </div>
             <RankingTable data={getTopPlayers()} category={selectedCategory} />
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <p className="text-gray-400">暫無數據</p>
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-12 text-center">
+            <p className="text-neutral-500">暫無數據</p>
           </div>
         )}
       </main>

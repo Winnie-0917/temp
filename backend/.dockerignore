@@ -15,3 +15,14 @@ ENV/
 data/*.json
 .git
 .gitignore
+bad_input_movid/
+bad_output_movid/
+good_input_movid/
+good_output_movid/
+normal_input_movid/
+normal_output_movid/
+uploads/
+*.mp4
+*.avi
+*.mov
+node_modules/

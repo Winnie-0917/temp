@@ -313,6 +313,84 @@ class FailureAnalyzer:
                 'fallback_analysis': self._basic_analysis(structured_data)
             }
     
+    def classify_video_quality(self, video_path: str) -> Dict:
+        """
+        使用 Gemini AI 自動分類影片品質 (Good/Normal/Bad)
+        
+        Args:
+            video_path: 影片路徑
+            
+        Returns:
+            分類結果 {'quality': 'good'|'normal'|'bad', 'reason': '...'}
+        """
+        if not self.model:
+            return {'quality': 'normal', 'reason': 'Gemini API 未配置，預設為 Normal'}
+            
+        try:
+            # 1. 抽取關鍵幀進行結構化分析 (作為輔助資訊)
+            frames = self.extract_key_frames(video_path, num_frames=5)
+            pose_analysis = self.analyze_pose_sequence(frames)
+            
+            # 2. 構建提示詞
+            prompt = f"""
+你是一位專業的桌球教練。請觀看這段影片，並根據選手的表現進行評分分類。
+
+分類標準：
+- Good (好球): 動作標準、發力流暢、擊球點準確、重心轉移良好。
+- Normal (普通): 動作基本正確但有小瑕疵，或是一般的回合球。
+- Bad (失誤/差): 明顯的擊球失誤、動作變形、腳步未到位、揮空或出界/掛網。
+
+📊 輔助技術數據 (僅供參考)：
+{json.dumps(pose_analysis, indent=2, ensure_ascii=False)}
+
+請以 JSON 格式輸出分類結果：
+{{
+  "quality": "good 或 normal 或 bad",
+  "reason": "分類理由（30字以內）",
+  "confidence": "信心分數 (0-1)"
+}}
+
+請務必只輸出 JSON。
+"""
+            
+            # 3. 呼叫 Gemini API (傳送影片)
+            if os.path.exists(video_path):
+                with open(video_path, 'rb') as f:
+                    video_data = f.read()
+                
+                video_base64 = base64.b64encode(video_data).decode('utf-8')
+                
+                response = self.model.generate_content([
+                    {"text": prompt},
+                    {"inline_data": {"mime_type": "video/mp4", "data": video_base64}}
+                ])
+                
+                # 4. 解析回應
+                result_text = response.text
+                
+                # 移除可能的 markdown 標記
+                if '```json' in result_text:
+                    result_text = result_text.split('```json')[1].split('```')[0]
+                elif '```' in result_text:
+                    result_text = result_text.split('```')[1].split('```')[0]
+                
+                result = json.loads(result_text.strip())
+                
+                # 確保 quality 是小寫且有效
+                quality = result.get('quality', 'normal').lower()
+                if quality not in ['good', 'normal', 'bad']:
+                    quality = 'normal'
+                result['quality'] = quality
+                
+                return result
+                
+            else:
+                return {'quality': 'normal', 'reason': '影片檔案不存在'}
+                
+        except Exception as e:
+            print(f"Gemini 分類失敗: {e}")
+            return {'quality': 'normal', 'reason': f'分析錯誤: {str(e)}'}
+
     def _basic_analysis(self, structured_data: Dict) -> Dict:
         """基礎分析（當 Gemini 不可用時）"""
         tech_indicators = structured_data.get('technical_indicators', {})
