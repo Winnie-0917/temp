@@ -102,10 +102,17 @@ class AnalysisHistoryService:
             player2_focus: 選手2 (可選)
             
         Returns:
-            紀錄 ID
+            紀錄 ID (若已存在則返回現有 ID)
         """
-        record_id = str(uuid.uuid4())[:8]
         video_id = video_info.get('video_id', '')
+        
+        # 重複偵測：檢查是否已有相同 video_id 的紀錄
+        existing_record = self.find_by_video_id(video_id)
+        if existing_record:
+            print(f"⚠️ 影片已分析過: {video_id}, 返回現有紀錄: {existing_record['record_id']}")
+            return existing_record['record_id']
+        
+        record_id = str(uuid.uuid4())[:8]
         
         # 建立縮圖 URL
         thumbnail_url = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
@@ -226,3 +233,22 @@ class AnalysisHistoryService:
                 results.append(record)
         
         return results
+
+    def find_by_video_id(self, video_id: str) -> Optional[Dict[str, Any]]:
+        """
+        根據 video_id 查找紀錄
+        
+        Args:
+            video_id: YouTube 影片 ID
+            
+        Returns:
+            找到的紀錄摘要，或 None
+        """
+        if not video_id:
+            return None
+            
+        index = self._load_index()
+        for record in index:
+            if record.get('video_id') == video_id:
+                return record
+        return None
