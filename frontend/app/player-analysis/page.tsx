@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "../components/Navbar";
 import PlayerProfileCard from "../../components/PlayerProfileCard";
+import AnalyzedPlayersSection from "../../components/AnalyzedPlayersSection";
 
 interface PerformanceClip {
   timestamp: string;
@@ -1242,6 +1243,11 @@ function PlayerAnalysisContent() {
       <div className="max-w-4xl mx-auto mt-12 pb-20">
         <h2 className="text-xl font-bold mb-6">近期分析紀錄</h2>
         <HistoryList />
+      </div>
+
+      {/* Analyzed Players Database */}
+      <div className="max-w-4xl mx-auto mt-8">
+        <AnalyzedPlayersSection onPlayerClick={setSelectedPlayerProfile} />
       </div>
 
       {/* Player Profile Modal */}
